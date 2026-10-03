@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PHONEX 2026 — Smartphone Benchmark & Recommendation Engine</title>
+
+    <!-- Tailwind CSS + GSAP + Alpine.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        canvas: '#070A11',
+                        surface: '#0F172A',
+                        card: '#162032',
+                        accent: '#6366F1',
+                        emerald: '#10B981',
+                        rose: '#F43F5E',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #070A11; color: #F3F4F6; font-family: system-ui, -apple-system, sans-serif; }
+        .glass-panel {
+            background: rgba(22, 32, 50, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-accent {
+            box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body x-data="phonexApp()" class="min-h-screen flex flex-col antialiased pb-20 md:pb-0">
+
+    <!-- Top Luxury Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-white/10 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div @click="tab = 'catalog'" class="flex items-center gap-2 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-400 flex items-center justify-center font-bold text-white shadow-lg glow-accent">
+                    PX
+                </div>
+                <div>
+                    <span class="font-extrabold text-lg tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">PHONEX 2026</span>
+                    <span class="block text-[10px] text-emerald-400 font-semibold tracking-widest uppercase">SPECS & BENCHMARKS</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                <button @click="tab = 'catalog'" :class="tab === 'catalog' ? 'text-emerald-400 font-bold' : 'text-slate-300 hover:text-white'" class="transition">Katalog & Benchmark</button>
+                <button @click="tab = 'compare'" :class="tab === 'compare' ? 'text-emerald-400 font-bold' : 'text-slate-300 hover:text-white'" class="transition">Komparasi HP</button>
+                <button @click="tab = 'recommendation'" :class="tab === 'recommendation' ? 'text-emerald-400 font-bold' : 'text-slate-300 hover:text-white'" class="transition">Quiz Rekomendasi</button>
+                <button @click="tab = 'admin'" :class="tab === 'admin' ? 'text-indigo-400 font-bold' : 'text-slate-300 hover:text-white'" class="px-4 py-1.5 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600/50 transition">Admin Panel</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main View Switcher -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- TAB 1: KATALOG & LIVE FILTERS -->
+        <div x-show="tab === 'catalog'" class="space-y-6">
+
+            <!-- Hero Section -->
+            <div class="glass-panel rounded-2xl p-6 md:p-8 text-center relative overflow-hidden">
+                <div class="absolute -top-24 -left-24 w-60 h-60 bg-indigo-500/20 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-24 -right-24 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl"></div>
+
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 mb-3">
+                    DATABASE BENCHMARK 2026 UPDATE
+                </span>
+                <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
+                    Rekomendasi HP & AnTuTu Benchmark 2026
+                </h1>
+                <p class="text-slate-400 text-xs md:text-sm max-w-2xl mx-auto">
+                    Temukan smartphone ideal berdasarkan Snapdragon 8 Elite & Dimensity 9400+, skor kamera, dan budget harian.
+                </p>
+            </div>
+
+            <!-- Live Filter Panel -->
+            <div class="glass-panel rounded-xl p-4 md:p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Cari HP / Chipset</label>
+                        <input type="text" x-model="search" placeholder="misal: Snapdragon 8 Elite, Vivo..." class="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Merek</label>
+                        <select x-model="selectedBrand" class="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                            <option value="">Semua Merek</option>
+                            <template x-for="b in brands" :key="b">
+                                <option :value="b" x-text="b"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Max Budget: <span class="text-emerald-400 font-bold" x-text="formatRupiah(maxPrice)"></span></label>
+                        <input type="range" x-model.number="maxPrice" min="3000000" max="30000000" step="1000000" class="w-full accent-emerald-500 cursor-pointer">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Urutkan Berdasarkan</label>
+                        <select x-model="sortBy" class="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                            <option value="antutu_score">AnTuTu Score (Gaming)</option>
+                            <option value="price_asc">Harga Terendah</option>
+                            <option value="price_desc">Harga Tertinggi</option>
+                            <option value="camera_score">Kamera DXO Rating</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phones Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                <template x-for="phone in filteredPhones" :key="phone.id">
+                    <div class="glass-panel rounded-2xl overflow-hidden flex flex-col hover:border-indigo-500/50 transition-all duration-300 group">
+                        <div class="relative h-48 bg-slate-900/50 p-4 flex items-center justify-center overflow-hidden">
+                            <img :src="phone.image_url" :alt="phone.name" class="h-full object-contain group-hover:scale-105 transition-transform duration-300">
+                            <template x-if="phone.badge">
+                                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-indigo-500 text-white shadow" x-text="phone.badge"></span>
+                            </template>
+                            <span class="absolute bottom-3 right-3 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-white/10" x-text="phone.brand"></span>
+                        </div>
+
+                        <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h3 class="font-bold text-base text-white group-hover:text-indigo-400 transition-colors" x-text="phone.name"></h3>
+                                <p class="text-xs text-slate-400" x-text="phone.chipset + ' • ' + phone.ram_gb + 'GB/' + phone.storage_gb + 'GB'"></p>
+                            </div>
+
+                            <!-- Performance Bar -->
+                            <div class="space-y-1.5 bg-slate-900/60 p-2.5 rounded-lg border border-white/5">
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-slate-400">AnTuTu v11:</span>
+                                    <span class="font-bold text-emerald-400" x-text="phone.antutu_score.toLocaleString('id-ID')"></span>
+                                </div>
+                                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-emerald-500 to-indigo-500 rounded-full" :style="'width: ' + Math.min(100, Math.round((phone.antutu_score / 3500000) * 100)) + '%'"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                <span class="font-black text-emerald-400 text-base" x-text="formatRupiah(phone.price)"></span>
+                                <button @click="openCompare(phone.id)" class="px-3 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 text-xs font-semibold transition">
+                                    Compare
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 2: KOMPARASI HEAD-TO-HEAD -->
+        <div x-show="tab === 'compare'" class="space-y-6">
+            <div class="text-center space-y-2">
+                <h1 class="text-2xl md:text-3xl font-extrabold text-white">Side-by-Side Comparison Matrix</h1>
+                <p class="text-xs md:text-sm text-slate-400">Bandingkan 2 smartphone langsung untuk melihat skor performa dan kamera.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass-panel p-4 rounded-xl">
+                    <label class="block text-xs font-semibold text-slate-400 mb-2">Smartphone #1</label>
+                    <select x-model.number="compare1" class="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <template x-for="p in phones" :key="p.id">
+                            <option :value="p.id" x-text="p.brand + ' — ' + p.name"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <div class="glass-panel p-4 rounded-xl">
+                    <label class="block text-xs font-semibold text-slate-400 mb-2">Smartphone #2</label>
+                    <select x-model.number="compare2" class="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <template x-for="p in phones" :key="p.id">
+                            <option :value="p.id" x-text="p.brand + ' — ' + p.name"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Comparison Cards -->
+            <template x-if="p1 && p2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl space-y-4 border border-indigo-500/30">
+                        <div class="text-center space-y-2">
+                            <img :src="p1.image_url" class="h-40 mx-auto object-contain">
+                            <h2 class="text-xl font-bold text-white" x-text="p1.name"></h2>
+                            <p class="text-xs text-indigo-400 font-semibold" x-text="p1.brand + ' • ' + formatRupiah(p1.price)"></p>
+                        </div>
+
+                        <div class="space-y-3 pt-4 border-t border-white/10 text-xs">
+                            <div>
+                                <span class="text-slate-400 block">Chipset:</span>
+                                <span class="font-bold text-white" x-text="p1.chipset"></span>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-slate-400">AnTuTu Benchmark:</span>
+                                    <span class="font-bold text-emerald-400" x-text="p1.antutu_score.toLocaleString('id-ID')"></span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-500 rounded-full" :style="'width: ' + Math.min(100, Math.round((p1.antutu_score/3500000)*100)) + '%'"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-slate-400">Camera Score (DXO):</span>
+                                    <span class="font-bold text-indigo-400" x-text="p1.camera_score + ' / 165'"></span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-indigo-500 rounded-full" :style="'width: ' + Math.min(100, Math.round((p1.camera_score/165)*100)) + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl space-y-4 border border-emerald-500/30">
+                        <div class="text-center space-y-2">
+                            <img :src="p2.image_url" class="h-40 mx-auto object-contain">
+                            <h2 class="text-xl font-bold text-white" x-text="p2.name"></h2>
+                            <p class="text-xs text-emerald-400 font-semibold" x-text="p2.brand + ' • ' + formatRupiah(p2.price)"></p>
+                        </div>
+
+                        <div class="space-y-3 pt-4 border-t border-white/10 text-xs">
+                            <div>
+                                <span class="text-slate-400 block">Chipset:</span>
+                                <span class="font-bold text-white" x-text="p2.chipset"></span>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-slate-400">AnTuTu Benchmark:</span>
+                                    <span class="font-bold text-emerald-400" x-text="p2.antutu_score.toLocaleString('id-ID')"></span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-500 rounded-full" :style="'width: ' + Math.min(100, Math.round((p2.antutu_score/3500000)*100)) + '%'"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-slate-400">Camera Score (DXO):</span>
+                                    <span class="font-bold text-indigo-400" x-text="p2.camera_score + ' / 165'"></span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-indigo-500 rounded-full" :style="'width: ' + Math.min(100, Math.round((p2.camera_score/165)*100)) + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- TAB 3: QUIZ REKOMENDASI -->
+        <div x-show="tab === 'recommendation'" class="space-y-6 max-w-2xl mx-auto">
+            <div class="text-center space-y-2">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+                    INTELLIGENT QUIZ FINDER 2026
+                </span>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-white">Rekomendasi HP Instant</h1>
+                <p class="text-xs text-slate-400">3 Langkah cepat menemukan HP paling tepat sesuai budget.</p>
+            </div>
+
+            <!-- Quiz Step 1 -->
+            <div x-show="quizStep === 1" class="glass-panel p-6 rounded-2xl space-y-6">
+                <h3 class="text-lg font-bold text-white text-center">Maksimal Budget Kamu Berapa?</h3>
+                <div class="text-center space-y-2">
+                    <span class="text-2xl font-extrabold text-emerald-400" x-text="formatRupiah(quizBudget)"></span>
+                    <input type="range" x-model.number="quizBudget" min="3000000" max="30000000" step="1000000" class="w-full accent-emerald-500 cursor-pointer">
+                </div>
+                <button @click="quizStep = 2" class="w-full py-3 rounded-xl bg-emerald-500 font-bold text-white text-sm hover:bg-emerald-600 transition">
+                    Lanjut ke Langkah 2 →
+                </button>
+            </div>
+
+            <!-- Quiz Step 2 -->
+            <div x-show="quizStep === 2" class="glass-panel p-6 rounded-2xl space-y-6">
+                <h3 class="text-lg font-bold text-white text-center">Apa Fokus Utama Kamu?</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button @click="quizPriority = 'antutu_score'" :class="quizPriority === 'antutu_score' ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 bg-slate-900/50'" class="p-4 rounded-xl border text-center transition">
+                        <span class="font-bold text-sm text-white block">Gaming & Performa</span>
+                        <span class="text-[10px] text-slate-400">AnTuTu v11 High</span>
+                    </button>
+                    <button @click="quizPriority = 'camera_score'" :class="quizPriority === 'camera_score' ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-slate-900/50'" class="p-4 rounded-xl border text-center transition">
+                        <span class="font-bold text-sm text-white block">Fotografi Kamera</span>
+                        <span class="text-[10px] text-slate-400">DXOMark High</span>
+                    </button>
+                    <button @click="quizPriority = 'price'" :class="quizPriority === 'price' ? 'border-amber-500 bg-amber-500/10' : 'border-white/10 bg-slate-900/50'" class="p-4 rounded-xl border text-center transition">
+                        <span class="font-bold text-sm text-white block">Paling Murah Value</span>
+                        <span class="text-[10px] text-slate-400">Harga Terjangkau</span>
+                    </button>
+                </div>
+                <div class="flex gap-3">
+                    <button @click="quizStep = 1" class="w-1/3 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold text-sm">Back</button>
+                    <button @click="quizStep = 3" class="w-2/3 py-3 rounded-xl bg-emerald-500 font-bold text-white text-sm hover:bg-emerald-600">Lihat Rekomendasi →</button>
+                </div>
+            </div>
+
+            <!-- Quiz Step 3 -->
+            <div x-show="quizStep === 3" class="space-y-4">
+                <div class="flex justify-between items-center px-2">
+                    <h3 class="font-bold text-white text-lg">Top 3 Smartphone Rekomendasi:</h3>
+                    <button @click="quizStep = 1" class="text-xs text-indigo-400 hover:underline">Ulangi Quiz</button>
+                </div>
+                <template x-for="(phone, index) in quizResults" :key="phone.id">
+                    <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 border border-white/10 hover:border-emerald-500/40 transition">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold flex items-center justify-center text-lg" x-text="'#' + (index + 1)"></div>
+                        <img :src="phone.image_url" class="w-16 h-16 object-contain">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-white text-base" x-text="phone.name"></h4>
+                            <p class="text-xs text-slate-400" x-text="phone.chipset + ' • ' + formatRupiah(phone.price)"></p>
+                            <span class="inline-block mt-1 text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold" x-text="'AnTuTu: ' + phone.antutu_score.toLocaleString('id-ID')"></span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 4: ADMIN PANEL (STRICT: INLINE FORM, NO MODALS) -->
+        <div x-show="tab === 'admin'" class="space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white">Admin Management — Smartphone Catalog</h1>
+                    <p class="text-xs text-slate-400">Kelola database smartphone secara langsung (Inline CRUD tanpa modal).</p>
+                </div>
+                <button x-show="!showForm" @click="openCreateForm()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-bold text-white text-xs transition">
+                    + Tambah Smartphone
+                </button>
+            </div>
+
+            <!-- INLINE CREATE/EDIT FORM (EXPANDABLE ACCORDION - NO MODAL) -->
+            <div x-show="showForm" class="glass-panel p-6 rounded-2xl border border-indigo-500/40 space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-white/10">
+                    <h3 class="font-bold text-base text-white" x-text="form.id ? 'Edit Smartphone #' + form.id : 'Tambah Smartphone Baru'"></h3>
+                    <button @click="showForm = false" class="text-xs text-slate-400 hover:text-rose-400 font-semibold">✕ Batal</button>
+                </div>
+
+                <form @submit.prevent="savePhone()" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Nama HP</label>
+                        <input type="text" x-model="form.name" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Merek (Brand)</label>
+                        <input type="text" x-model="form.brand" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Harga (IDR)</label>
+                        <input type="number" x-model.number="form.price" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Chipset</label>
+                        <input type="text" x-model="form.chipset" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">AnTuTu Score</label>
+                        <input type="number" x-model.number="form.antutu_score" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Camera Score (DXO)</label>
+                        <input type="number" x-model.number="form.camera_score" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-slate-400 mb-1">Image URL</label>
+                        <input type="url" x-model="form.image_url" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Badge Tag</label>
+                        <input type="text" x-model="form.badge" placeholder="Flagship, Value King..." class="w-full bg-slate-900 border border-white/10 rounded-lg p-2.5 text-white">
+                    </div>
+
+                    <div class="md:col-span-3 flex justify-end gap-3 pt-3 border-t border-white/10">
+                        <button type="button" @click="showForm = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-semibold">Batal</button>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500">Simpan Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <div class="glass-panel rounded-2xl overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-900/80 text-slate-400 uppercase text-[10px] font-bold">
+                        <tr>
+                            <th class="p-3">HP</th>
+                            <th class="p-3">Harga</th>
+                            <th class="p-3">Chipset</th>
+                            <th class="p-3">AnTuTu v11</th>
+                            <th class="p-3 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 text-slate-300">
+                        <template x-for="phone in phones" :key="phone.id">
+                            <tr class="hover:bg-slate-900/40">
+                                <td class="p-3 flex items-center gap-3">
+                                    <img :src="phone.image_url" class="w-8 h-8 object-contain">
+                                    <div>
+                                        <span class="font-bold text-white block" x-text="phone.name"></span>
+                                        <span class="text-[10px] text-slate-400" x-text="phone.brand"></span>
+                                    </div>
+                                </td>
+                                <td class="p-3 font-semibold text-emerald-400" x-text="formatRupiah(phone.price)"></td>
+                                <td class="p-3" x-text="phone.chipset"></td>
+                                <td class="p-3 font-bold text-white" x-text="phone.antutu_score.toLocaleString('id-ID')"></td>
+                                <td class="p-3 text-right space-x-2">
+                                    <button @click="openEditForm(phone)" class="px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 font-semibold">Edit</button>
+                                    <button @click="deletePhone(phone.id)" class="px-2.5 py-1 rounded bg-rose-600/30 text-rose-300 font-semibold">Hapus</button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-white/10 px-6 py-2 flex justify-between items-center text-xs">
+        <button @click="tab = 'catalog'" :class="tab === 'catalog' ? 'text-emerald-400 font-bold' : 'text-slate-400'" class="flex flex-col items-center gap-1">
+            <span>Katalog</span>
+        </button>
+        <button @click="tab = 'compare'" :class="tab === 'compare' ? 'text-emerald-400 font-bold' : 'text-slate-400'" class="flex flex-col items-center gap-1">
+            <span>Compare</span>
+        </button>
+        <button @click="tab = 'recommendation'" :class="tab === 'recommendation' ? 'text-emerald-400 font-bold' : 'text-slate-400'" class="flex flex-col items-center gap-1">
+            <span>Rekomendasi</span>
+        </button>
+        <button @click="tab = 'admin'" :class="tab === 'admin' ? 'text-indigo-400 font-bold' : 'text-slate-400'" class="flex flex-col items-center gap-1">
+            <span>Admin</span>
+        </button>
+    </nav>
+
+    <script>
+        function phonexApp() {
+            const initialData = [
+                { id: 1, name: 'Red Magic 10S Pro+', brand: 'RedMagic', price: 14999000, chipset: 'Snapdragon 8 Elite', ram_gb: 24, storage_gb: 1024, antutu_score: 2907137, camera_score: 142, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80', badge: 'Ultimate Gaming' },
+                { id: 2, name: 'Vivo X200 Ultra', brand: 'Vivo', price: 17999000, chipset: 'Snapdragon 8 Elite', ram_gb: 16, storage_gb: 1024, antutu_score: 2885137, camera_score: 165, image_url: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&auto=format&fit=crop&q=80', badge: 'Camera King 2026' },
+                { id: 3, name: 'OPPO Find X8 Ultra', brand: 'OPPO', price: 16999000, chipset: 'Snapdragon 8 Elite', ram_gb: 16, storage_gb: 512, antutu_score: 2883092, camera_score: 163, image_url: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600&auto=format&fit=crop&q=80', badge: 'Hasselblad Quad Cam' },
+                { id: 4, name: 'OnePlus Ace 5 Pro', brand: 'OnePlus', price: 9999000, chipset: 'Snapdragon 8 Elite', ram_gb: 16, storage_gb: 512, antutu_score: 2890600, camera_score: 148, image_url: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=600&auto=format&fit=crop&q=80', badge: 'Flagship Killer 2026' },
+                { id: 5, name: 'iQOO 13', brand: 'iQOO', price: 9999000, chipset: 'Snapdragon 8 Elite', ram_gb: 16, storage_gb: 512, antutu_score: 2868237, camera_score: 152, image_url: 'https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=600&auto=format&fit=crop&q=80', badge: 'Monster Gaming' },
+                { id: 6, name: 'Samsung Galaxy S25 Ultra', brand: 'Samsung', price: 21999000, chipset: 'Snapdragon 8 Elite OC', ram_gb: 12, storage_gb: 512, antutu_score: 2787981, camera_score: 160, image_url: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&auto=format&fit=crop&q=80', badge: 'Galaxy AI Flagship' },
+                { id: 7, name: 'iPhone 16 Pro Max', brand: 'Apple', price: 23999000, chipset: 'Apple A18 Pro', ram_gb: 8, storage_gb: 512, antutu_score: 2150000, camera_score: 164, image_url: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80', badge: 'Pro Video Standard' },
+                { id: 8, name: 'Poco F7 Ultra', brand: 'Poco', price: 8999000, chipset: 'Snapdragon 8 Elite', ram_gb: 16, storage_gb: 512, antutu_score: 2662420, camera_score: 145, image_url: 'https://images.unsplash.com/photo-1546054454-aa26e2b734c7?w=600&auto=format&fit=crop&q=80', badge: 'Extreme Performance' },
+                { id: 9, name: 'Infinix GT 30 Pro', brand: 'Infinix', price: 3499000, chipset: 'Dimensity 8400', ram_gb: 12, storage_gb: 256, antutu_score: 1450000, camera_score: 128, image_url: 'https://images.unsplash.com/photo-1567581935884-3349723552ca?w=600&auto=format&fit=crop&q=80', badge: 'Best Budget Gaming' }
+            ];
+
+            const saved = localStorage.getItem('phonex_phones');
+            const phones = saved ? JSON.parse(saved) : initialData;
+
+            return {
+                tab: 'catalog',
+                phones: phones,
+                search: '',
+                selectedBrand: '',
+                maxPrice: 30000000,
+                sortBy: 'antutu_score',
+                compare1: 1,
+                compare2: 2,
+                quizStep: 1,
+                quizBudget: 10000000,
+                quizPriority: 'antutu_score',
+                showForm: false,
+                form: { id: null, name: '', brand: '', price: 5000000, chipset: '', antutu_score: 1000000, camera_score: 120, image_url: '', badge: '' },
+
+                get brands() {
+                    return [...new Set(this.phones.map(p => p.brand))];
+                },
+
+                get filteredPhones() {
+                    return this.phones.filter(p => {
+                        const matchesSearch = !this.search || p.name.toLowerCase().includes(this.search.toLowerCase()) || p.chipset.toLowerCase().includes(this.search.toLowerCase());
+                        const matchesBrand = !this.selectedBrand || p.brand === this.selectedBrand;
+                        const matchesPrice = p.price <= this.maxPrice;
+                        return matchesSearch && matchesBrand && matchesPrice;
+                    }).sort((a, b) => {
+                        if (this.sortBy === 'antutu_score') return b.antutu_score - a.antutu_score;
+                        if (this.sortBy === 'price_asc') return a.price - b.price;
+                        if (this.sortBy === 'price_desc') return b.price - a.price;
+                        if (this.sortBy === 'camera_score') return b.camera_score - a.camera_score;
+                        return 0;
+                    });
+                },
+
+                get p1() { return this.phones.find(p => p.id === this.compare1); },
+                get p2() { return this.phones.find(p => p.id === this.compare2); },
+
+                get quizResults() {
+                    return this.phones
+                        .filter(p => p.price <= this.quizBudget)
+                        .sort((a, b) => (b[this.quizPriority] || 0) - (a[this.quizPriority] || 0))
+                        .slice(0, 3);
+                },
+
+                formatRupiah(val) {
+                    return 'Rp ' + (val || 0).toLocaleString('id-ID');
+                },
+
+                openCompare(id) {
+                    this.compare1 = id;
+                    this.tab = 'compare';
+                },
+
+                openCreateForm() {
+                    this.form = { id: null, name: '', brand: '', price: 5000000, chipset: '', antutu_score: 1000000, camera_score: 120, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80', badge: '' };
+                    this.showForm = true;
+                },
+
+                openEditForm(phone) {
+                    this.form = { ...phone };
+                    this.showForm = true;
+                },
+
+                savePhone() {
+                    if (this.form.id) {
+                        const idx = this.phones.findIndex(p => p.id === this.form.id);
+                        if (idx !== -1) this.phones[idx] = { ...this.form };
+                    } else {
+                        const newId = this.phones.length ? Math.max(...this.phones.map(p => p.id)) + 1 : 1;
+                        this.phones.push({ ...this.form, id: newId, ram_gb: 12, storage_gb: 256 });
+                    }
+                    localStorage.setItem('phonex_phones', JSON.stringify(this.phones));
+                    this.showForm = false;
+                },
+
+                deletePhone(id) {
+                    this.phones = this.phones.filter(p => p.id !== id);
+                    localStorage.setItem('phonex_phones', JSON.stringify(this.phones));
+                }
+            }
+        }
+    </script>
+</body>
+</html>
